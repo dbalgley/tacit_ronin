@@ -1,35 +1,63 @@
 #include "elevator.h"
 
-Elevator::Elevator(int floors) : currentFloor(1), totalFloors(floors), isMoving(false) {
-    floorQueue.resize(floors, false);
+Elevator::Elevator(int floors) : currentFloor(1), totalFloors(floors), status("Idle") {}
+
+void Elevator::moveUp() {
+    if(currentFloor < totalFloors) {
+        currentFloor++;
+        status = "MovingUp";
+    } else {
+        status = "Idle";
+    }
+}
+
+void Elevator::moveDown() {
+    if(currentFloor > 1) {
+        currentFloor--;
+        status = "MovingDown";
+    } else {
+        status = "Idle";
+    }
 }
 
 void Elevator::requestFloor(int floor) {
-    if (floor > 0 && floor <= totalFloors) {
-        floorQueue[floor - 1] = true; // Mark the floor for a stop
-        move();
+    if (floor >= 1 && floor <= totalFloors && floor != currentFloor) {
+        floorRequests.push_back(floor);
+        if(floor > currentFloor) {
+            moveUp();
+        } else {
+            moveDown();
+        }
     } else {
         std::cerr << "Invalid floor requested: " << floor << std::endl;
     }
 }
 
-void Elevator::move() {
-    if(!isMoving) {
-        isMoving = true;
+void Elevator::tick() {
+    if (floorRequests.empty()) {
+        status = "Idle";
+        return;
+    }
 
-        // Real simple version, move to top, then move down
-        for (int i = 0; i < totalFloors; ++i) {
-            if (floorQueue[i]) {
-                currentFloor = i + 1;
-                floorQueue[i] = false;
-                std::cout << "Elevator stopping at floor: " << currentFloor << std::endl;
-            }
-        }
+    int nextFloor = floorRequests.front();
 
-        isMoving = false;
+    if (currentFloor == nextFloor) {
+        status = "DoorsOpen";
+        floorRequests.pop_front();
+        return;
+    }
+
+    if (currentFloor < nextFloor) {
+        moveUp();
+    } else {
+        moveDown();
     }
 }
 
 int Elevator::getCurrentFloor() const {
     return currentFloor;
+}
+
+std::string Elevator::getStatus() const {
+    return status;
 }
