@@ -4,38 +4,51 @@
 #include <cstdlib>
 #include <thread>
 #include <chrono>
+#include <sstream>
+#include <algorithm>
 
 #include "elevator.h"
 #include "elevatorStatus.h"
 
 using namespace std;
 
+std::vector<int> parseFloors(const std::string& input) {
+    std::vector<int> floors;
+    std::stringstream ss(input);
+    std::string floor;
+
+    while (getline(ss, floor, ',')) {
+        floor.erase(std::remove_if(floor.begin(), floor.end(), ::isspace), floor.end());
+
+        floors.push_back(stoi(floor));
+    }
+
+    return floors;
+}
+
 int main(int argc, char* argv[]) {
     if (argc <= 1) {
-        std::cerr << "Usage: " << argv[0] << " <startingFloorN> <floor1> <floor2> ... <floorN>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <startingFloorN>, <floor1>, <floor2>, ..., <floorN>" << std::endl;
         return 1;
     }
 
-    // Parse CL arg to get the starting floor
-    int startFloor = std::atoi(argv[1]);
-
     // Parse CL args to get the floors
-    std::vector<int> floorsToVisit;
-    for (int i = 2; i < argc; ++i) {
-        int floor = std::atoi(argv[i]);
-        floorsToVisit.push_back(floor);
+    std::vector<int> floorsToVisit = parseFloors(argv[1]);
+
+    if (floorsToVisit.size() < 1) {
+        std::cerr << "Invalid input. At least one floor is required." << std::endl;
     }
 
-    Elevator elevator(startFloor, 32);
+    Elevator elevator(floorsToVisit[0], 32);
 
     std::cout << "Elevator is starting on floor: " << elevator.getCurrentFloor() << std::endl;
 
     double travelTime = 0.0f;
 
     // Sim some floor requests
-    for (int floor : floorsToVisit) {
-        elevator.requestFloor(floor);
-        while(elevator.getCurrentFloor() != floor) {
+    for (size_t i = 1; i < floorsToVisit.size(); ++i) {
+        elevator.requestFloor(floorsToVisit[i]);
+        while(elevator.getCurrentFloor() != floorsToVisit[i]) {
             elevator.tick();
             travelTime += elevator.getTotalTravelTime(elevator.getStatus());
             std::cout << "Elevator is currently at floor: " << elevator.getCurrentFloor()
