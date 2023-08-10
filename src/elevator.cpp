@@ -1,33 +1,33 @@
 #include "elevator.h"
 
-Elevator::Elevator(int floors) : currentFloor(1), totalFloors(floors), status("Idle") {}
+#include "elevatorMode.h"
+#include "elevatorStatus.h"
+
+Elevator::Elevator(int startFloor, int floors, ElevatorMode mode) : currentFloor(1), totalFloors(floors), opMode(mode), status(ElevatorStatus::IDLE) {
+    currentFloor = startFloor;
+}
 
 void Elevator::moveUp() {
     if(currentFloor < totalFloors) {
         currentFloor++;
-        status = "MovingUp";
+        status = ElevatorStatus::MOVING_UP;
     } else {
-        status = "Idle";
+        status = ElevatorStatus::IDLE;
     }
 }
 
 void Elevator::moveDown() {
     if(currentFloor > 1) {
         currentFloor--;
-        status = "MovingDown";
+        status = ElevatorStatus::MOVING_DOWN;
     } else {
-        status = "Idle";
+        status = ElevatorStatus::IDLE;
     }
 }
 
 void Elevator::requestFloor(int floor) {
     if (floor >= 1 && floor <= totalFloors && floor != currentFloor) {
         floorRequests.push_back(floor);
-        if(floor > currentFloor) {
-            moveUp();
-        } else {
-            moveDown();
-        }
     } else {
         std::cerr << "Invalid floor requested: " << floor << std::endl;
     }
@@ -35,15 +35,26 @@ void Elevator::requestFloor(int floor) {
 
 void Elevator::tick() {
     if (floorRequests.empty()) {
-        status = "Idle";
+        status = ElevatorStatus::IDLE;
+        return;
+    }
+
+    if (status == ElevatorStatus::DOORS_OPEN) {
+        status = ElevatorStatus::LOADING;
+        return;
+    }
+
+    if (status == ElevatorStatus::LOADING) {
+        status = ElevatorStatus::DOORS_CLOSE;
         return;
     }
 
     int nextFloor = floorRequests.front();
 
     if (currentFloor == nextFloor) {
-        status = "DoorsOpen";
+        status = ElevatorStatus::DOORS_OPEN;
         floorRequests.pop_front();
+
         return;
     }
 
@@ -58,6 +69,34 @@ int Elevator::getCurrentFloor() const {
     return currentFloor;
 }
 
-std::string Elevator::getStatus() const {
+ElevatorStatus Elevator::getStatus() const {
     return status;
+}
+
+ElevatorMode Elevator::getOpMode() const {
+    return opMode;
+}
+
+double Elevator::getFloorTravelTime() const {
+    return floorTravelTime;
+}
+
+double Elevator::getDoorsTime() const {
+    return doorsTime;
+}
+
+double Elevator::getLoadingTime() const {
+    return loadingTime;
+}
+
+double Elevator::getTotalTravelTime(ElevatorStatus status) {
+    if (status == ElevatorStatus::DOORS_OPEN) {
+        return floorTravelTime + doorsTime;
+    } else if (status == ElevatorStatus::DOORS_CLOSE) {
+        return doorsTime;
+    } else if (status == ElevatorStatus::LOADING) {
+        return loadingTime;
+    } else {
+        return floorTravelTime;
+    }
 }
