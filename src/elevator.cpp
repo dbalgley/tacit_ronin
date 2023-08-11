@@ -90,9 +90,7 @@ double Elevator::getLoadingTime() const {
 }
 
 double Elevator::getTotalTravelTime(ElevatorStatus status) {
-    if (status == ElevatorStatus::DOORS_OPEN) {
-        return floorTravelTime + doorsTime;
-    } else if (status == ElevatorStatus::DOORS_CLOSE) {
+    if (status == ElevatorStatus::DOORS_OPEN || status == ElevatorStatus::DOORS_CLOSE) {
         return doorsTime;
     } else if (status == ElevatorStatus::LOADING) {
         return loadingTime;
