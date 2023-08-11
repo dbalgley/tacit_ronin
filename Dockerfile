@@ -18,8 +18,8 @@ COPY . .
 RUN mkdir build && cd build && cmake .. && make
 
 FROM builder AS tester
-RUN ./build/bin/tacit_ronin_test
-RUN echo $?
+RUN ./build/bin/tacit_ronin_test > test_results.txt
+RUN cat test_results.txt
 
 #FROM ubuntu:latest
 #COPY --from=builder /usr/src/app/build/bin/tacit_ronin /usr/local/bin/tacit_ronin

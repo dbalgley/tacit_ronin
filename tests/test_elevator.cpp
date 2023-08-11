@@ -1,55 +1,56 @@
 #include <gtest/gtest.h>
 #include "elevator.h"
+#include "directElevator.h"
 #include "elevatorMode.h"
 #include "elevatorStatus.h"
 
 class ElevatorTest : public ::testing::Test {
 protected:
-    Elevator elevator;
+    DirectElevator directElevatorInstance;
 
-    ElevatorTest() : elevator(1, 5, ElevatorMode::DIRECT) {}
+    ElevatorTest() : directElevatorInstance(1, 5) {}
 };
 
 TEST_F(ElevatorTest, TestStartFloor) {
-    ASSERT_EQ(elevator.getCurrentFloor(), 1);
+    ASSERT_EQ(directElevatorInstance.getCurrentFloor(), 1);
 }
 
 TEST_F(ElevatorTest, TestMoveUp) {
-    elevator.moveUp();
-    ASSERT_EQ(elevator.getCurrentFloor(), 2);
-    ASSERT_EQ(elevator.getStatus(), ElevatorStatus::MOVING_UP);
+    directElevatorInstance.moveUp();
+    ASSERT_EQ(directElevatorInstance.getCurrentFloor(), 2);
+    ASSERT_EQ(directElevatorInstance.getStatus(), ElevatorStatus::MOVING_UP);
 }
 
 TEST_F(ElevatorTest, TestMoveDown) {
-    elevator.moveDown();
-    ASSERT_EQ(elevator.getCurrentFloor(), 1);
+    directElevatorInstance.moveDown();
+    ASSERT_EQ(directElevatorInstance.getCurrentFloor(), 1);
     // Should remain IDLE since it's at the bottom floor.
-    ASSERT_EQ(elevator.getStatus(), ElevatorStatus::IDLE);
+    ASSERT_EQ(directElevatorInstance.getStatus(), ElevatorStatus::IDLE);
 }
 
 TEST_F(ElevatorTest, TestRequestValidFloor) {
-    elevator.requestFloor(3);
-    elevator.tick();
-    ASSERT_EQ(elevator.getStatus(), ElevatorStatus::MOVING_UP);
+    directElevatorInstance.requestFloor(3);
+    directElevatorInstance.tick();
+    ASSERT_EQ(directElevatorInstance.getStatus(), ElevatorStatus::MOVING_UP);
 }
 
 TEST_F(ElevatorTest, TestRequestSameFloor) {
-    elevator.requestFloor(1);
+    directElevatorInstance.requestFloor(1);
     // Requesting the current floor should not change the status.
-    ASSERT_EQ(elevator.getStatus(), ElevatorStatus::IDLE);
+    ASSERT_EQ(directElevatorInstance.getStatus(), ElevatorStatus::IDLE);
 }
 
 TEST_F(ElevatorTest, TestRequestInvalidFloor) {
-    elevator.requestFloor(6);  // Assuming 5 floors.
-    ASSERT_EQ(elevator.getStatus(), ElevatorStatus::IDLE);
+    directElevatorInstance.requestFloor(6);  // Assuming 5 floors.
+    ASSERT_EQ(directElevatorInstance.getStatus(), ElevatorStatus::IDLE);
 }
 
 TEST_F(ElevatorTest, TestTickDoorsOpen) {
-    elevator.requestFloor(3);
-    elevator.tick();  // Moving up
-    elevator.tick();  // Moving up
-    elevator.tick();  // Now at floor 3
-    ASSERT_EQ(elevator.getStatus(), ElevatorStatus::DOORS_OPEN);
+    directElevatorInstance.requestFloor(3);
+    directElevatorInstance.tick();  // Moving up
+    directElevatorInstance.tick();  // Moving up
+    directElevatorInstance.tick();  // Now at floor 3
+    ASSERT_EQ(directElevatorInstance.getStatus(), ElevatorStatus::DOORS_OPEN);
 }
 
 int main(int argc, char **argv) {

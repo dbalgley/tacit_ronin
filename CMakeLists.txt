@@ -40,7 +40,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(tacit_ronin_test ./src/elevator.cpp ./tests/test_elevator.cpp)
+add_executable(tacit_ronin_test ./src/elevator.cpp ./src/directElevator.cpp ./tests/test_elevator.cpp)
 target_link_libraries(tacit_ronin_test GTest::gtest_main)
 
 include(GoogleTest)

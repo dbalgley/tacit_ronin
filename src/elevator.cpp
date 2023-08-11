@@ -3,9 +3,7 @@
 #include "elevatorMode.h"
 #include "elevatorStatus.h"
 
-Elevator::Elevator(int startFloor, int floors, ElevatorMode mode) : currentFloor(1), totalFloors(floors), opMode(mode), status(ElevatorStatus::IDLE) {
-    currentFloor = startFloor;
-}
+Elevator::Elevator(int startFloor, int floors) : currentFloor(startFloor), totalFloors(floors), status(ElevatorStatus::IDLE) {}
 
 void Elevator::moveUp() {
     if(currentFloor < totalFloors) {
@@ -25,56 +23,12 @@ void Elevator::moveDown() {
     }
 }
 
-void Elevator::requestFloor(int floor) {
-    if (floor >= 1 && floor <= totalFloors && floor != currentFloor) {
-        floorRequests.push_back(floor);
-    } else {
-        std::cerr << "Invalid floor requested: " << floor << std::endl;
-    }
-}
-
-void Elevator::tick() {
-    if (floorRequests.empty()) {
-        status = ElevatorStatus::IDLE;
-        return;
-    }
-
-    if (status == ElevatorStatus::DOORS_OPEN) {
-        status = ElevatorStatus::LOADING;
-        return;
-    }
-
-    if (status == ElevatorStatus::LOADING) {
-        status = ElevatorStatus::DOORS_CLOSE;
-        return;
-    }
-
-    int nextFloor = floorRequests.front();
-
-    if (currentFloor == nextFloor) {
-        status = ElevatorStatus::DOORS_OPEN;
-        floorRequests.pop_front();
-
-        return;
-    }
-
-    if (currentFloor < nextFloor) {
-        moveUp();
-    } else {
-        moveDown();
-    }
-}
-
 int Elevator::getCurrentFloor() const {
     return currentFloor;
 }
 
 ElevatorStatus Elevator::getStatus() const {
     return status;
-}
-
-ElevatorMode Elevator::getOpMode() const {
-    return opMode;
 }
 
 double Elevator::getFloorTravelTime() const {

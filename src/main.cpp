@@ -7,7 +7,7 @@
 #include <sstream>
 #include <algorithm>
 
-#include "elevator.h"
+#include "directElevator.h"
 #include "elevatorStatus.h"
 
 using namespace std;
@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "Invalid input. At least one floor is required." << std::endl;
     }
 
-    Elevator elevator(floorsToVisit[0], 32);
+    DirectElevator elevator(floorsToVisit[0], 32);
 
     std::cout << "Elevator is starting on floor: " << elevator.getCurrentFloor() << std::endl;
 
