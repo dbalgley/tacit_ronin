@@ -1,5 +1,5 @@
 # Use a base image with a C++ compiler and standard library.
-FROM ubuntu:latest
+FROM ubuntu:latest AS builder
 
 # Install necessary packages.
 RUN apt-get update && apt-get install -y \
@@ -17,6 +17,14 @@ COPY . .
 # Build the project.
 RUN mkdir build && cd build && cmake .. && make
 
+FROM builder AS tester
+RUN ./build/bin/tacit_ronin_test
+RUN echo $?
+
+#FROM ubuntu:latest
+#COPY --from=builder /usr/src/app/build/bin/tacit_ronin /usr/local/bin/tacit_ronin
+
 # Run the program.
 ENTRYPOINT ["./build/bin/tacit_ronin"]
+#ENTRYPOINT ["/bin/bash"]
 CMD []
