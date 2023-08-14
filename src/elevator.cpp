@@ -1,6 +1,5 @@
 #include "elevator.h"
 
-#include "elevatorMode.h"
 #include "elevatorStatus.h"
 
 /**
