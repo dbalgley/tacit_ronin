@@ -12,8 +12,11 @@ ScanElevator::ScanElevator(int startFloor, int floors, double travelTime, double
     : Elevator(startFloor, floors, travelTime, actuateTime, loadTime), goingUp(true) {}
 
 /**
- * Request the elevator to stop at a specific floor.
- * @param floor: The floor to stop at.
+ * @brief Request the elevator to move to a specific floor.
+ * 
+ * If the floor is invalid (outside the range of floors, or is the current floor), it prints an error.
+ * 
+ * @param floor The floor number to move to.
  */
 void ScanElevator::requestFloor(int floor) {
     if (floor == currentFloor) return;
@@ -36,7 +39,10 @@ bool ScanElevator::isFloorRequested(const std::set<int>& requests, int floor) co
 }
 
 /**
- * Update the elevator's status and position for each "tick".
+ * @brief A simulation tick for the DirectElevator.
+ * 
+ * This function simulates one time unit for the elevator's operations, such as moving between floors, 
+ * opening/closing doors, or loading passengers.
  */
 void ScanElevator::tick() {
     if ((upRequests.empty() && downRequests.empty()) && status == ElevatorStatus::DOORS_CLOSE) {
